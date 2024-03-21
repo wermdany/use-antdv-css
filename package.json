@@ -51,6 +51,7 @@
   "dependencies": {
     "@emotion/css": "^11.11.2",
     "ant-design-vue": "^4.1.2",
+    "change-case": "^5.4.3",
     "vue": "^3.4.21"
   },
   "devDependencies": {
