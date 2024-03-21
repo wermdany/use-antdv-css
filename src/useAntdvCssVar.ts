@@ -10,8 +10,8 @@ export const defaultGlobalCssVarScope = '--css-global-theme-var'
 
 export const defaultIgnoreVar = (token: string) => !/^[a-z]/.test(token)
 
-export function defaultSuffixPx(token: string, value: any) {
-  if (typeof value === 'number' && !/^((zIndex)|(lineHeight)|(fontWeight)|(opacity))/.test(token))
+export function defaultSuffix(token: string, value: any) {
+  if (typeof value === 'number' && !/^((zIndex)|(lineHeight)|(fontWeight)|(opacity)|(motion))/.test(token))
     return `${value}px`
 
   return value
@@ -31,8 +31,9 @@ interface UserCssVar extends CustomCssVar, AliasToken {}
 
 export interface GlobalCssVarOptions {
   scope: string
+  prefixVar: string
   ignoreVar: (token: string) => boolean
-  suffixPx: (token: string, value: any) => string | number
+  suffix: (token: string, value: any) => string | number
 }
 
 /**
@@ -43,8 +44,9 @@ export interface GlobalCssVarOptions {
 export function useGlobalCssVar(cssVars?: Record<string, string>, options?: Partial<GlobalCssVarOptions>) {
   const {
     scope = defaultGlobalCssVarScope,
+    prefixVar = 'ant',
     ignoreVar = defaultIgnoreVar,
-    suffixPx = defaultSuffixPx,
+    suffix = defaultSuffix,
   } = options || {}
 
   const { token } = theme.useToken()
@@ -52,7 +54,7 @@ export function useGlobalCssVar(cssVars?: Record<string, string>, options?: Part
   const useCssVar = () => {
     const element = getGlobalCssVarElement(scope)
 
-    const text = getCssVarContent(Object.assign(token.value, cssVars), ignoreVar, suffixPx)
+    const text = getCssVarContent(Object.assign(token.value, cssVars), { prefixVar, ignoreVar, suffix })
 
     element.innerHTML = text
   }
@@ -94,7 +96,11 @@ function getGlobalCssVarElement(scope: string) {
   return element
 }
 
-function getCssVarContent(token: AliasToken, ignoreVar: GlobalCssVarOptions['ignoreVar'], suffixPx: GlobalCssVarOptions['suffixPx']) {
+export interface CssVarContentOptions extends Omit<GlobalCssVarOptions, 'scope'> {}
+
+function getCssVarContent(token: AliasToken, options: CssVarContentOptions) {
+  const { prefixVar, ignoreVar, suffix } = options
+
   const cssVars: string[] = []
 
   for (const key in token) {
@@ -102,9 +108,9 @@ function getCssVarContent(token: AliasToken, ignoreVar: GlobalCssVarOptions['ign
       if (ignoreVar(key))
         continue
 
-      const kebabKey = `--${kebabCase(key)}`
+      const kebabKey = `--${prefixVar}-${kebabCase(key)}`
 
-      const value = suffixPx(key, token[key as keyof AliasToken])
+      const value = suffix(key, token[key as keyof AliasToken])
 
       if (!TokenToCssVarStore[key])
         TokenToCssVarStore[key] = `var(${kebabKey})`
