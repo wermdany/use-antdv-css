@@ -1,4 +1,4 @@
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 import { theme } from 'ant-design-vue'
 import { kebabCase } from 'change-case'
 import { css } from '@emotion/css'
@@ -51,21 +51,24 @@ export function useGlobalCssVar(cssVars?: Record<string, string>, options?: Part
 
   const { token } = theme.useToken()
 
-  const useCssVar = () => {
+  const useCssVar = (token: UserCssVar) => {
     const element = getGlobalCssVarElement(scope)
 
-    const text = getCssVarContent(Object.assign(token.value, cssVars), { prefixVar, ignoreVar, suffix })
+    const text = getCssVarContent(token, { prefixVar, ignoreVar, suffix })
 
     element.innerHTML = text
   }
 
+  const globalToken = computed<UserCssVar>(() => Object.assign(token.value, cssVars))
+
   watch(
-    [token, cssVars],
-    () => {
-      useCssVar()
+    globalToken,
+    (token) => {
+      useCssVar(token)
     },
     {
       immediate: true,
+      deep: true,
     },
   )
 }
