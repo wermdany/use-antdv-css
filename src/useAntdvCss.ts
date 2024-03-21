@@ -2,12 +2,10 @@ import { computed } from 'vue'
 import { theme } from 'ant-design-vue'
 import { css } from '@emotion/css'
 
-import type { UnwrapRef } from 'vue'
 import type { CSSInterpolation } from '@emotion/css'
+import type { AliasToken } from 'ant-design-vue/es/theme/interface'
 
-type ThemeToken = UnwrapRef<ReturnType<typeof theme.useToken>['token']>
-
-export type GenCSSInterpolation = (token: ThemeToken) => CSSInterpolation | CSSInterpolation[]
+export type GenCSSInterpolation = (token: AliasToken) => CSSInterpolation | CSSInterpolation[]
 
 /**
  * 应用 ant-design-vue css token

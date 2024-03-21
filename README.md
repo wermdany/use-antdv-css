@@ -110,12 +110,6 @@ declare module 'use-antdv-css' {
 
 这样就可以 `useAntdvCssVar` 应用自定义 `token`
 
-## 警告
-
-由于 `ant-design-vue` token 本身的原因 提供的 并不包含单位，考虑到处理 300+ 变量单位和计算问题，在使用 `useAntdvCssVar` 时需要自己处理单位，比如 `font-size` 等
-
-自定义的变量自己按需处理
-
 ## 灵感
 
 来源于 [use-emotion-css](https://github.com/ant-design/use-emotion-css)

@@ -3,22 +3,36 @@ import { theme } from 'ant-design-vue'
 import { kebabCase } from 'change-case'
 import { css } from '@emotion/css'
 
-import type { UnwrapRef } from 'vue'
-import type { GlobalToken } from 'ant-design-vue/es/theme'
 import type { CSSInterpolation } from '@emotion/css'
+import type { AliasToken } from 'ant-design-vue/es/theme/interface'
 
 export const defaultGlobalCssVarScope = '--css-global-theme-var'
 
 export const defaultIgnoreVar = (token: string) => !/^[a-z]/.test(token)
+
+export function defaultSuffixPx(token: string, value: any) {
+  if (typeof value === 'number' && !/^((zIndex)|(lineHeight)|(fontWeight)|(opacity))/.test(token))
+    return `${value}px`
+
+  return value
+}
 
 /**
  * 缓存的 css 变量转换
  */
 export const TokenToCssVarStore: Record<string, string> = {}
 
+/**
+ * 自定义 css 变量声明
+ */
+export interface CustomCssVar {}
+
+interface UserCssVar extends CustomCssVar, AliasToken {}
+
 export interface GlobalCssVarOptions {
   scope: string
   ignoreVar: (token: string) => boolean
+  suffixPx: (token: string, value: any) => string | number
 }
 
 /**
@@ -27,14 +41,18 @@ export interface GlobalCssVarOptions {
  * @param options
  */
 export function useGlobalCssVar(cssVars?: Record<string, string>, options?: Partial<GlobalCssVarOptions>) {
-  const { scope = defaultGlobalCssVarScope, ignoreVar = defaultIgnoreVar } = options || {}
+  const {
+    scope = defaultGlobalCssVarScope,
+    ignoreVar = defaultIgnoreVar,
+    suffixPx = defaultSuffixPx,
+  } = options || {}
 
   const { token } = theme.useToken()
 
   const useCssVar = () => {
     const element = getGlobalCssVarElement(scope)
 
-    const text = getCssVarContent(Object.assign(token.value, cssVars), ignoreVar)
+    const text = getCssVarContent(Object.assign(token.value, cssVars), ignoreVar, suffixPx)
 
     element.innerHTML = text
   }
@@ -49,15 +67,6 @@ export function useGlobalCssVar(cssVars?: Record<string, string>, options?: Part
     },
   )
 }
-
-type ThemeToken = UnwrapRef<ReturnType<typeof theme.useToken>['token']>
-
-/**
- * 自定义 css 变量声明
- */
-export interface CustomCssVar {}
-
-interface UserCssVar extends CustomCssVar, ThemeToken {}
 
 export type GenVarCSSInterpolation = (token: UserCssVar) => CSSInterpolation | CSSInterpolation[]
 
@@ -85,20 +94,22 @@ function getGlobalCssVarElement(scope: string) {
   return element
 }
 
-function getCssVarContent(token: GlobalToken, ignore: GlobalCssVarOptions['ignoreVar']) {
+function getCssVarContent(token: AliasToken, ignoreVar: GlobalCssVarOptions['ignoreVar'], suffixPx: GlobalCssVarOptions['suffixPx']) {
   const cssVars: string[] = []
 
   for (const key in token) {
     if (Object.prototype.hasOwnProperty.call(token, key)) {
-      if (ignore(key))
+      if (ignoreVar(key))
         continue
 
       const kebabKey = `--${kebabCase(key)}`
 
+      const value = suffixPx(key, token[key as keyof AliasToken])
+
       if (!TokenToCssVarStore[key])
         TokenToCssVarStore[key] = `var(${kebabKey})`
 
-      cssVars.push(`  ${kebabKey}: ${token[key as keyof GlobalToken]};`)
+      cssVars.push(`  ${kebabKey}: ${value};`)
     }
   }
 
