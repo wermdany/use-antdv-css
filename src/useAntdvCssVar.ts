@@ -1,4 +1,4 @@
-import { computed, watch } from 'vue'
+import { watch } from 'vue'
 import { theme } from 'ant-design-vue'
 import { kebabCase } from 'change-case'
 import { css } from '@emotion/css'
@@ -11,6 +11,9 @@ export const defaultGlobalCssVarScope = '--css-global-theme-var'
 
 export const defaultIgnoreVar = (token: string) => !/^[a-z]/.test(token)
 
+/**
+ * 缓存的 css 变量转换
+ */
 export const TokenToCssVarStore: Record<string, string> = {}
 
 export interface GlobalCssVarOptions {
@@ -18,6 +21,11 @@ export interface GlobalCssVarOptions {
   ignoreVar: (token: string) => boolean
 }
 
+/**
+ * 创建全局 css 变量
+ * @param cssVars 附加的 css 变量
+ * @param options
+ */
 export function useGlobalCssVar(cssVars?: Record<string, string>, options?: Partial<GlobalCssVarOptions>) {
   const { scope = defaultGlobalCssVarScope, ignoreVar = defaultIgnoreVar } = options || {}
 
@@ -44,12 +52,19 @@ export function useGlobalCssVar(cssVars?: Record<string, string>, options?: Part
 
 type ThemeToken = UnwrapRef<ReturnType<typeof theme.useToken>['token']>
 
+/**
+ * 自定义 css 变量声明
+ */
 export interface CustomCssVar {}
 
 interface UserCssVar extends CustomCssVar, ThemeToken {}
 
 export type GenVarCSSInterpolation = (token: UserCssVar) => CSSInterpolation | CSSInterpolation[]
 
+/**
+ * 应用 ant-design-vue css 变量
+ * @param genVarCss
+ */
 export function useAntdvCssVar(genVarCss: GenVarCSSInterpolation) {
   return css(genVarCss(TokenToCssVarStore as unknown as UserCssVar))
 }

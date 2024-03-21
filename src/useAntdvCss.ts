@@ -9,6 +9,10 @@ type ThemeToken = UnwrapRef<ReturnType<typeof theme.useToken>['token']>
 
 export type GenCSSInterpolation = (token: ThemeToken) => CSSInterpolation | CSSInterpolation[]
 
+/**
+ * 应用 ant-design-vue css token
+ * @param genCss
+ */
 export function useAntdvCss(genCss: GenCSSInterpolation) {
   const { token } = theme.useToken()
 

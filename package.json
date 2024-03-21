@@ -3,7 +3,7 @@
   "type": "module",
   "version": "1.0.1",
   "packageManager": "pnpm@8.15.3",
-  "description": "use antdv css token",
+  "description": "更加简单的应用 ant-design-vue 的主题",
   "author": "wermdany <https://github.com/wermdany>",
   "license": "MIT",
   "homepage": "https://github.com/wermdany/use-antdv-css",
@@ -14,7 +14,14 @@
   "bugs": {
     "url": "https://github.com/wermdany/use-antdv-css/issues"
   },
-  "keywords": [],
+  "keywords": [
+    "ant-design-vue",
+    "antdv",
+    "emotion",
+    "css",
+    "var",
+    "theme"
+  ],
   "sideEffects": false,
   "exports": {
     ".": {
