@@ -1,7 +1,7 @@
 {
   "name": "use-antdv-css",
   "type": "module",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "packageManager": "pnpm@8.15.3",
   "description": "更加简单的应用 ant-design-vue 的主题",
   "author": "wermdany <https://github.com/wermdany>",
