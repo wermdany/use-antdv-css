@@ -60,7 +60,7 @@ export function useGlobalCssVar(cssVars?: Record<string, string>, options?: Part
   }
 
   watch(
-    () => [token, cssVars],
+    [token, cssVars],
     () => {
       useCssVar()
     },
